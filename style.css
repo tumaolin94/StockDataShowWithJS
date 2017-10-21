@@ -1,0 +1,37 @@
+a:visited {color:blue;} /* Change Visited Link Style */
+a:hover {color:black;}   /* Change Mouse Mover Style */
+
+body{
+	text-align: center;
+}
+div.input_container{
+	background-color: #f5f5f5;
+   	width: 450px;
+   	display:inline-block;
+}
+div.line{
+    margin: 10px;
+    margin-top:0px;
+    width:95%;
+    height:1px;
+    background:#d6d6d6
+}
+h1{
+  	font-family: &quot;Times New Roman&quot;,Serif;
+  	font-weight: 700;
+  	margin: 10px;	
+}
+
+form{
+	text-align:left;
+    margin-left: 15px;
+    font-family: &quot;Times New Roman&quot;,Serif;
+}
+
+#sub{
+	margin-left: 45%;
+    margin-top: 5px
+}
+#whole_container{
+	width: 100%;  margin: 0 auto;
+}
