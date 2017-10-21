@@ -17,7 +17,7 @@ div.line{
     background:#d6d6d6
 }
 h1{
-  	font-family: &quot;Times New Roman&quot;,Serif;
+  	font-family: "Times New Roman",Serif;
   	font-weight: 700;
   	margin: 10px;	
 }
@@ -25,7 +25,7 @@ h1{
 form{
 	text-align:left;
     margin-left: 15px;
-    font-family: &quot;Times New Roman&quot;,Serif;
+    font-family: "Times New Roman",Serif;
 }
 
 #sub{

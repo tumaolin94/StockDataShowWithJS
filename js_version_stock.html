@@ -1,3 +1,7 @@
+<!-- 
+@author: Maolin Tu
+@blog: http://tumaolin.com
+ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,15 +11,50 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <!--CSS file-->
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <!-- JS file -->
     <script src="myScript.js"></script>
+    <script>
+function submitSymbol(what){
+    var symbol = what.symbol.value;
+    console.log(symbol);
+
+    document.getElementById('symbol').value=symbol;
+    var url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" +symbol+"&outputsize=full&apikey=FEY146OML7L2A34X";
+    console.log(url);
+
+    var xmlhttp;
+    if(window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+      xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        try{
+                            jsonObj = JSON.parse(xmlhttp.responseText);
+                             // alert(jsonObj);
+                             // generateChart3(jsonObj, indicator_name);
+                            console.log(jsonObj);
+                        }catch(e){
+                            alert("JSON File Syntax Error");
+                            console.log(jsonObj);
+                            console.log(e);
+                            return null;
+                        }
+                    }
+                };
+      xmlhttp.open("GET", url, true);
+      xmlhttp.send();
+}
+    </script>
 </head>
 <body>
     <div class="input_container" >
         <h1><i>Stock Search</i></h1>
         <div class="line"></div>
         <form id="form1" method="POST">
-            Enter Stock Ticker Symbol:*<input  type="test" name="symbol" value=""><br>
-            <input id="sub" type="button" name="submit" onclick="viewJSON(this.form) value="Search">
+            Enter Stock Ticker Symbol:*<input id="symbol" type="text" name="symbol" value=""><br>
+            <input id="sub" type="button" name="submit" onclick="submitSymbol(this.form)" value="Search">
             &nbsp&nbsp
             <input type = "button" onclick="formReset()" value="Clear"><br>
             * - <i>Mandatory fields.</i>
