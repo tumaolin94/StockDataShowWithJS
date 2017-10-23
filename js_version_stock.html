@@ -1,10 +1,12 @@
+<!DOCTYPE html>
 <!-- 
 @author: Maolin Tu
 @blog: http://tumaolin.com
  -->
-<!DOCTYPE html>
 <html>
 <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <title>Stock</title>
     <!--importing highcharts-->
     <script src="http://code.highcharts.com/highcharts.js"></script>
@@ -161,14 +163,14 @@ function generateTable(jsonObj){
         htmlText +="<td class='right'>";
 
         htmlText +="<a href='javascript:drawPrice()'>Price</a>&nbsp&nbsp";
-        htmlText +="<a href=''>SMA</a>&nbsp&nbsp";
-        htmlText +="<a href=''>EMA</a>&nbsp&nbsp";
-        htmlText +="<a href=''>STOCH</a>&nbsp&nbsp";
-        htmlText +="<a href=''>RSI</a>&nbsp&nbsp";
-        htmlText +="<a href=''>ADX</a>&nbsp&nbsp";
-        htmlText +="<a href=''>CCI</a>&nbsp&nbsp";
-        htmlText +="<a href=''>BBANDS</a>&nbsp&nbsp";
-        htmlText +="<a href=''>MACD</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'SMA\',\'"+symbol+"\',\'1\')\">SMA</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'EMA\',\'"+symbol+"\',\'1\')\">EMA</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'STOCH\',\'"+symbol+"\',\'2\')\">STOCH</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'RSI\',\'"+symbol+"\',\'1\')\">RSI</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'ADX\',\'"+symbol+"\',\'1\')\">ADX</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'CCI\',\'"+symbol+"\',\'1\')\">CCI</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'BBANDS\',\'"+symbol+"\',\'3\')\">BBANDS</a>&nbsp&nbsp";
+        htmlText +="<a href=\"javascript:drawCharts(\'MACD\',\'"+symbol+"\',\'3\')\">MACD</a>&nbsp&nbsp";
         htmlText +="</td></tr>";
         htmlText +="</table></div><br>";
         document.getElementById("whole_container").innerHTML=htmlText;
@@ -255,6 +257,149 @@ function drawAreaAndVolume(){
             
         },
     });
+}
+/*function testMultiple, Draw different kind of charts*/
+function drawCharts(indicator, symbol, number){
+    var url = "";
+    if(number=='3'){
+        url = "https://www.alphavantage.co/query?function="+indicator+"&symbol="+symbol+"&interval=daily&time_period=5&series_type=close&nbdevup=3&nbdevdn=3&apikey=FEY146OML7L2A34X";
+    }else if(number=='2'){
+        url = "https://www.alphavantage.co/query?function="+indicator+"&symbol="+symbol+"&interval=daily&slowkmatype=1&slowdmatype=1&apikey=FEY146OML7L2A34X";        
+    }else if(number=='1'){
+        url = "https://www.alphavantage.co/query?function="+indicator+"&symbol="+symbol+"&interval=daily&time_period=10&series_type=close&apikey=FEY146OML7L2A34X";
+    }else{
+        alert('You need to implement your own url!');
+    }
+
+    console.log(url);
+    var xmlhttp;
+        if(window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+        xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        // alert(this.responseText);
+
+                        try{
+                            jsonObj = JSON.parse(xmlhttp.responseText);
+                             generateChart(jsonObj, indicator, number);
+                            console.log(jsonObj);
+                        }catch(e){
+                            alert("JSON File Syntax Error");
+                            console.log(jsonObj);
+                            console.log(e);
+                            return null;
+                        }
+                    }
+                };
+      xmlhttp.open("GET", url, true);
+      xmlhttp.send();
+}
+
+function generateChart(jsonObj, indicator, number){
+        var meta = jsonObj['Meta Data'];
+        var symbol = meta['1: Symbol'];
+        var fullname = meta['2: Indicator']; //full name
+        console.log(symbol);
+        var data_values = jsonObj['Technical Analysis: ' + indicator]; //full size data
+        var meta_date = meta['3: Last Refreshed'];
+        console.log(meta_date);
+        var date = new Array();
+        var key_array = new Array();
+        var dataD = [];
+        var dataK = [];
+        var data_array = new Array();
+        var count = 0;
+        console.log(data_values[meta_date]);
+        for(var i=0;i<parseInt(number);i++){
+            data_array[i] = new Array();
+
+        }
+        for(var key in data_values[meta_date]){
+            console.log(key);
+            key_array.push(key);
+        }
+        console.log(key_array);
+
+        for(var key in data_values) {
+                   var temp_date = key.substring(5).replace(/-/g, "\/");
+                    if(temp_date.length>=6) temp_date = temp_date.substr(0,5);
+                    date.push(temp_date);
+                    for(var i=0;i<key_array.length;i++){
+                        data_array[i].push(parseFloat(data_values[key][key_array[i]]));
+                    }
+                    if(count == 126) break;
+                    count = count + 1;
+                }
+      // dataD.reverse();
+      // dataK.reverse();
+      date.reverse();
+      console.log(date);
+      // console.log(dataD);
+      // console.log(dataK);
+        for(var i=0;i<parseInt(number);i++){
+            data_array[i].reverse();
+            console.log(data_array[i]);
+        }
+      var myChart = Highcharts.chart('container', {
+        chart: {
+            zoomType: 'x'
+        },
+        
+        title: {
+            text: fullname
+        },
+        subtitle: {
+        useHTML:true,
+        text: "<a style=' text-decoration: none' href='https://www.alphavantage.co/'  target='_blank' >Source: Alpha Vantage</a>" 
+        },
+        xAxis: {
+            categories:date,
+            tickInterval:5,
+            tickPositioner: function() {
+            let res = [];
+            for(let i = 0; i < this.categories.length; i++) {
+                if(i % 5 == 0) res.push(this.categories.length-i-1);
+            }
+            return res;
+        }
+        },
+        yAxis: [{
+            title: {
+                text: indicator
+            },
+            "labels":{
+            
+         },
+
+        }],
+        
+        series: [],
+        legend: {
+            layout: 'vertical',
+            verticalAlign: 'middle',
+            align: 'right'
+            
+        },
+    });
+        for(var i=0;i<parseInt(number);i++){
+             myChart.addSeries({
+                threshold: null,
+                lineWidth: 1.5,
+                name: symbol + ''+ key_array[i],
+                data: data_array[i],
+                marker:{
+                enabled:true,
+                radius: 2.5,
+                symbol: 'square'
+            }
+            });
+        }
+      // myChart.addSeries({
+      //           data: data_array[1]
+      //       });
 }
 
     </script>
