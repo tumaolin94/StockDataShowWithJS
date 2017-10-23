@@ -280,8 +280,6 @@ function drawCharts(indicator, symbol, number){
                 }
         xmlhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                        // alert(this.responseText);
-
                         try{
                             jsonObj = JSON.parse(xmlhttp.responseText);
                              generateChart(jsonObj, indicator, number);
@@ -298,21 +296,22 @@ function drawCharts(indicator, symbol, number){
       xmlhttp.send();
 }
 
+/*function testMultiple, Draw different kind of charts
+* @para jsonObj Object of JSON, indicator
+*       indicator indicator's name
+        number line number
+**/
 function generateChart(jsonObj, indicator, number){
         var meta = jsonObj['Meta Data'];
         var symbol = meta['1: Symbol'];
         var fullname = meta['2: Indicator']; //full name
-        console.log(symbol);
         var data_values = jsonObj['Technical Analysis: ' + indicator]; //full size data
         var meta_date = meta['3: Last Refreshed'];
-        console.log(meta_date);
+        
         var date = new Array();
         var key_array = new Array();
-        var dataD = [];
-        var dataK = [];
         var data_array = new Array();
         var count = 0;
-        console.log(data_values[meta_date]);
         for(var i=0;i<parseInt(number);i++){
             data_array[i] = new Array();
 
@@ -321,7 +320,6 @@ function generateChart(jsonObj, indicator, number){
             console.log(key);
             key_array.push(key);
         }
-        console.log(key_array);
 
         for(var key in data_values) {
                    var temp_date = key.substring(5).replace(/-/g, "\/");
@@ -333,15 +331,11 @@ function generateChart(jsonObj, indicator, number){
                     if(count == 126) break;
                     count = count + 1;
                 }
-      // dataD.reverse();
-      // dataK.reverse();
+
       date.reverse();
-      console.log(date);
-      // console.log(dataD);
-      // console.log(dataK);
+
         for(var i=0;i<parseInt(number);i++){
             data_array[i].reverse();
-            console.log(data_array[i]);
         }
       var myChart = Highcharts.chart('container', {
         chart: {
@@ -397,9 +391,6 @@ function generateChart(jsonObj, indicator, number){
             }
             });
         }
-      // myChart.addSeries({
-      //           data: data_array[1]
-      //       });
 }
 
     </script>
